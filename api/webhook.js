@@ -24,6 +24,9 @@ module.exports = async (req, res) => {
   }
 
   try {
+    if (req.method === 'GET') {
+        return res.status(200).json({ status: 'healthy' });
+      }
     // Log the incoming webhook data for debugging
     console.log('Received webhook data:', req.body);
 
