@@ -4,15 +4,30 @@ const fetch = require('node-fetch');
 const PIPEDRIVE_API_KEY = process.env.PIPEDRIVE_API_KEY;
 const PIPEDRIVE_COMPANY_DOMAIN = process.env.PIPEDRIVE_COMPANY_DOMAIN;
 
+// Export the handler function
 export default async function handler(req, res) {
+  // Add CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Handle preflight request
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
   try {
+    // Log incoming data for debugging
+    console.log('Received webhook data:', req.body);
+
     const webflowData = req.body;
     const formData = webflowData.data;
-    
+
     // Create a descriptive lead title
     const pipedriveData = {
       title: `New Patient Inquiry - ${formData.name || 'Unknown'}`,
