@@ -49,7 +49,6 @@ module.exports = async (req, res) => {
         amount: 0,
         currency: 'AUD'
       },
-      status: 'open',
       label: 'Contact Form'
     };
 
