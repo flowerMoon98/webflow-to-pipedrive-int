@@ -1,15 +1,15 @@
 {
-    "version": 2,
-    "routes": [
-      {
-        "src": "/api/webhook",
-        "dest": "/api/webhook.js",
-        "methods": ["POST"],
-        "headers": {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "POST",
-          "Access-Control-Allow-Headers": "Content-Type"
-        }
-      }
-    ]
-  }
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    }
+  ]
+}

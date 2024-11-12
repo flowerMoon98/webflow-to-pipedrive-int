@@ -1,36 +1,45 @@
-// File: /api/webhook.js
 const fetch = require('node-fetch');
 
 const PIPEDRIVE_API_KEY = process.env.PIPEDRIVE_API_KEY;
 const PIPEDRIVE_COMPANY_DOMAIN = process.env.PIPEDRIVE_COMPANY_DOMAIN;
 
-// Export the handler function
-export default async function handler(req, res) {
-  // Add CORS headers
+module.exports = async (req, res) => {
+  // Handle CORS
+  res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+  );
 
   // Handle preflight request
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    res.status(200).end();
+    return;
   }
 
-  // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
   try {
-    // Log incoming data for debugging
+    // Log the incoming webhook data for debugging
     console.log('Received webhook data:', req.body);
 
-    const webflowData = req.body;
-    const formData = webflowData.data;
+    // Extract form data from Webflow's format
+    const { data } = req.body;
+
+    if (!data || !data.name || !data.email || !data.contact_number) {
+      return res.status(400).json({
+        message: 'Missing required fields',
+        receivedData: data
+      });
+    }
 
     // Create a descriptive lead title
     const pipedriveData = {
-      title: `New Patient Inquiry - ${formData.name || 'Unknown'}`,
+      title: `New Patient Inquiry - ${data.name || 'Unknown'}`,
       person_id: null,
       value: {
         amount: 0,
@@ -51,9 +60,9 @@ export default async function handler(req, res) {
           'Authorization': `Bearer ${PIPEDRIVE_API_KEY}`
         },
         body: JSON.stringify({
-          name: formData.name,
-          email: [{ value: formData.email_address, primary: true }],
-          phone: [{ value: formData.contact_number, primary: true }]
+          name: data.name,
+          email: [{ value: data.email, primary: true }],
+          phone: [{ value: data.contact_number, primary: true }]
         })
       }
     );
@@ -84,17 +93,19 @@ export default async function handler(req, res) {
       throw new Error(`Failed to create lead: ${JSON.stringify(leadData)}`);
     }
 
-    // Add note with all form information
+    // Add detailed note with all form information
     const noteContent = `
 New Patient Inquiry Details:
 --------------------------
-Name: ${formData.name}
-Email: ${formData.email_address}
-Contact Number: ${formData.contact_number}
-Preferred Call Time: ${formData.preferred_call_time}
+Name: ${data.name}
+Email: ${data.email}
+Contact Number: ${data.contact_number}
+Preferred Contact Time: ${data.preferred_contact_time}
 
-Source: Tarneith Health Hub Website Contact Form
+Form Submission Details:
+----------------------
 Submission Time: ${new Date().toLocaleString('en-AU', { timeZone: 'Australia/Sydney' })}
+Source: Tarneith Health Hub Website Contact Form
     `.trim();
 
     await fetch(
@@ -113,6 +124,7 @@ Submission Time: ${new Date().toLocaleString('en-AU', { timeZone: 'Australia/Syd
       }
     );
 
+    // Return success response
     return res.status(200).json({
       message: 'Successfully created lead in Pipedrive',
       leadId: leadData.data.id
@@ -125,4 +137,4 @@ Submission Time: ${new Date().toLocaleString('en-AU', { timeZone: 'Australia/Syd
       error: error.message
     });
   }
-}
+};
