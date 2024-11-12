@@ -48,8 +48,7 @@ module.exports = async (req, res) => {
       value: {
         amount: 0,
         currency: 'AUD'
-      },
-      label: 'Contact Form'
+      }
     };
 
     // Create person in Pipedrive
