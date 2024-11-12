@@ -19,14 +19,15 @@ module.exports = async (req, res) => {
     return;
   }
 
+  if (req.method === 'GET') {
+    return res.status(200).json({ status: 'healthy' });
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
   try {
-    if (req.method === 'GET') {
-        return res.status(200).json({ status: 'healthy' });
-      }
     // Log the incoming webhook data for debugging
     console.log('Received webhook data:', req.body);
 
