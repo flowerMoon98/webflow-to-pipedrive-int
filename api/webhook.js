@@ -55,13 +55,12 @@ module.exports = async (req, res) => {
 
     // Create person in Pipedrive
     const personResponse = await fetch(
-      `https://${PIPEDRIVE_COMPANY_DOMAIN}.pipedrive.com/api/v1/persons`,
+      `https://${PIPEDRIVE_COMPANY_DOMAIN}.pipedrive.com/api/v1/persons?api_token=${PIPEDRIVE_API_KEY}`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${PIPEDRIVE_API_KEY}`
+          'Accept': 'application/json'
         },
         body: JSON.stringify({
           name: data.name,
@@ -80,13 +79,12 @@ module.exports = async (req, res) => {
 
     // Create lead in Pipedrive
     const leadResponse = await fetch(
-      `https://${PIPEDRIVE_COMPANY_DOMAIN}.pipedrive.com/api/v1/leads`,
+      `https://${PIPEDRIVE_COMPANY_DOMAIN}.pipedrive.com/api/v1/leads?api_token=${PIPEDRIVE_API_KEY}`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${PIPEDRIVE_API_KEY}`
+          'Accept': 'application/json'
         },
         body: JSON.stringify(pipedriveData)
       }
@@ -113,13 +111,12 @@ Source: Tarneith Health Hub Website Contact Form
     `.trim();
 
     await fetch(
-      `https://${PIPEDRIVE_COMPANY_DOMAIN}.pipedrive.com/api/v1/notes`,
+      `https://${PIPEDRIVE_COMPANY_DOMAIN}.pipedrive.com/api/v1/notes?api_token=${PIPEDRIVE_API_KEY}`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${PIPEDRIVE_API_KEY}`
+          'Accept': 'application/json'
         },
         body: JSON.stringify({
           content: noteContent,
