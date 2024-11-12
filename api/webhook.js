@@ -55,7 +55,7 @@ module.exports = async (req, res) => {
 
     // Create a descriptive lead title
     const pipedriveData = {
-      title: `New Patient Inquiry - ${data.name || 'Unknown'}`,
+      title: `Tarneith Health Hub - ${data.name || 'Unknown'}`,
       person_id: null,
       value: {
         amount: 0,
@@ -107,7 +107,7 @@ module.exports = async (req, res) => {
 
     // Add detailed note with all form information
     const noteContent = `
-New Patient Inquiry Details:
+Tarneith Health Hub Inquiry Details:
 --------------------------
 Name: ${data.name}
 Email: ${data.email}
