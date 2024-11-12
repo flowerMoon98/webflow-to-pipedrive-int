@@ -28,17 +28,29 @@ module.exports = async (req, res) => {
   }
 
   try {
-    // Log the incoming webhook data for debugging
-    console.log('Received webhook data:', req.body);
+    // Enhanced logging
+    console.log('Request Headers:', req.headers);
+    console.log('Raw Request Body:', req.body);
+    console.log('Content Type:', req.headers['content-type']);
 
-    // Extract form data from Webflow's format
-    const { data } = req.body;
+    // Extract form data from Webflow's actual format
+    const formData = req.body.payload?.data || {};
+    
+    const data = {
+        name: formData.Name || '',          // Matches Webflow's "Name" field
+        email: formData.Email || '',        // Matches Webflow's "Email" field
+        contact_number: formData.number || '',  // Matches Webflow's "number" field
+        preferred_contact_time: formData['Number 2'] || 'Not specified'  // Using Number 2 as preferred call time
+    };
 
-    if (!data || !data.name || !data.email || !data.contact_number) {
-      return res.status(400).json({
-        message: 'Missing required fields',
-        receivedData: data
-      });
+    // Log the transformed data
+    console.log('Transformed data:', data);
+
+    if (!data.name || !data.email || !data.contact_number) {
+        return res.status(400).json({
+            message: 'Missing required fields',
+            receivedData: data
+        });
     }
 
     // Create a descriptive lead title
